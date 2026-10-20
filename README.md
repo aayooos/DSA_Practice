@@ -19,5 +19,4 @@ Data Structures and Algorithms in C.
 
 ## Purpose
 
-This repository contains my practice implementations,
-experiments, and solutions while learning DSA in C.
+Uploading the programs here to keep a track and for revision purpose later during placements.
