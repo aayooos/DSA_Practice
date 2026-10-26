@@ -110,10 +110,10 @@ void inOrderTraversalIter(nodeptr node)
 void postOrderTraversalIter(nodeptr node)
 {
     nodeptr stack[100];
-    int top=-1;
+    int top = -1;
     nodeptr temp;
     nodeptr current = node;
-    stack[++top]=current;
+
     while(top!=-1 || current!=NULL)
     {
         if(current!=NULL)
@@ -123,12 +123,12 @@ void postOrderTraversalIter(nodeptr node)
         }
         else
         {
-            temp = current->rchild;
-            if(temp==NULL)
+            temp = stack[top]->rchild;
+            if(temp == NULL)
             {
                 temp = stack[top--];
                 printf("%d", temp->data);
-                while(top!=-1 && stack[top]->rchild==temp)
+                while(top != -1 && stack[top]->rchild == temp)
                 {
                     temp = stack[top--];
                     printf("%d", temp->data);
@@ -305,7 +305,7 @@ void insertRightThreaded(threadPointer s, threadPointer r)
     {
         r->rchild = s->rchild;
         r->rightThread=1;
-        
+
         s->rchild = r;
         s->rightThread=0;
     }
@@ -325,4 +325,155 @@ void insertRightThreaded(threadPointer s, threadPointer r)
         }
         temp->lchild = r;
     }
+}
+
+
+nodeptr createBST(nodeptr root, int item)
+{
+    if(root==NULL)
+    {
+        root = getNode();
+        root->data = item;
+        root->lchild = root->rchild = NULL;
+        return root;
+    }
+    else
+    {
+        if(item<root->data)
+        {
+            root->lchild = createBST(root->lchild, item);
+        }
+        else if(item>root->data)
+        {
+            root->rchild = createBST(root->rchild, item);
+        }
+        else
+            printf("Duplicates are not allowed. \n");
+    }
+    return root;
+}
+
+
+nodeptr BSTsearch(nodeptr root, int item)
+{
+    if(root==NULL)
+        return NULL;
+    if(item==root->data)
+        return root;
+    else if(item>root->data)
+        return BSTsearch(root->lchild, item);
+    else
+        return BSTsearch(root->rchild, item);
+}
+
+
+nodeptr BSTsearchIter(nodeptr root, int item)
+{
+    while(root)
+    {
+        if(item==root->data)
+            return root;
+        else if(item<root->data)
+            root = root->rchild;
+        else
+            root = root->lchild;
+    }
+    return NULL;
+}
+
+
+nodeptr insertBST(nodeptr node, int item)
+{
+    nodeptr temp = getNode();
+    temp->data = item;
+    temp->lchild = temp->rchild = NULL;
+    if(node==NULL)
+    {
+        node = temp;
+        return node;
+    }
+    nodeptr parent = NULL;
+    nodeptr current = node;
+    while(current)
+    {
+        parent = current;
+        if(current->data == item)
+        {
+            printf("Duplicates are not allowed. \n");
+            return node;
+        }
+        else if(current->data < item)
+        {
+            current = current->rchild;
+        }
+        else
+            current = current->lchild;
+    }
+    if(parent->data < item)
+    {
+        parent->rchild = temp;
+    }
+    else
+        parent->lchild = temp;
+}
+
+
+nodeptr deleteBST(nodeptr node, int item)
+{
+    nodeptr parent, current;
+    nodeptr succ, q;
+
+    if(node==NULL)
+    {
+        printf("Empty tree. \n");
+        return node;
+    }
+    parent = NULL;
+    current = node;
+    while(current && (current->data!=item))
+    {
+        parent = current;
+        if(current->data > item)
+            current = current->lchild;
+        else
+            current = current->rchild;
+    }
+    if(current==NULL)
+    {
+        printf("Item not found. \n");
+        return node;
+    }
+
+    if(current->lchild==NULL)
+        q = current->rchild;
+    else if(current->rchild==NULL)
+        q = current->lchild;
+    else
+    {
+        parent = current;
+        succ = parent->rchild;
+        while(succ->lchild)
+        {
+            parent = succ;
+            succ = succ->lchild;
+        }
+        current->data = succ->data;
+        current = succ;
+        q = current->rchild;
+    }
+
+    if(parent==NULL)
+    {
+        free(current);
+        node = q;
+        return node;
+    }
+    if(current==parent->lchild)
+    {
+        parent->lchild = q;
+    }
+    else
+        parent->rchild = q;
+    free(current);
+    return node;
 }
