@@ -94,6 +94,24 @@ void postOrderTraversalIter(nodeptr node)
 }
 
 
+void levelOrderTraversal(nodeptr node)
+{
+    nodeptr queue[100];
+    int front=0;
+    int rear=-1;
+    queue[++rear] = node;
+    while(front<=rear)
+    {
+        nodeptr current = queue[front++];
+        printf("%d", current->data);
+        if(current->lchild!=NULL)
+            queue[++rear] = current->lchild;
+        if(current->rchild!=NULL)
+            queue[++rear] = current->rchild;
+    }
+}
+
+
 void printParent(nodeptr node, nodeptr key)
 {
     if(node==NULL || key==NULL)
@@ -153,6 +171,28 @@ void printAncestors(nodeptr node, nodeptr key)
     nodeptr parent = returnParent(node, key);
     printf("%d ", parent->data);
     printAncestors(node, parent);
+}
+
+
+int search(nodeptr node, int key)
+{
+    if(node==NULL)
+        return 0;
+    if(node->data==key)
+        return 1;
+    return search(node->lchild, key) || search(node->rchild, key);
+}
+
+
+nodeptr createCopy(nodeptr node)
+{
+    if(node==NULL)
+        return NULL;
+    nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+    temp->data = node->data;
+    temp->lchild = createCopy(node->lchild);
+    temp->rchild = createCopy(node->rchild);
+    return temp;
 }
 
 
