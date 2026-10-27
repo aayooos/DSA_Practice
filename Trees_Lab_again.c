@@ -196,6 +196,96 @@ nodeptr createCopy(nodeptr node)
 }
 
 
+int countNodes(nodeptr node)
+{
+    if(node==NULL)
+        return 0;
+    static int count=0;
+    return 1+countNodes(node->lchild)+countNodes(node->rchild);
+}
+
+
+int equality(nodeptr node1, nodeptr node2)
+{
+    if(node1==NULL && node2==NULL)
+        return 1;
+    if(node1==NULL || node2==NULL)
+        return 0;
+    return ((node1->data==node2->data) && equality(node1->lchild, node2->lchild) && equality(node1->rchild, 
+    node2->rchild));
+}
+
+
+nodeptr createBST(nodeptr node, int element)
+{
+    if(node==NULL)
+    {
+        nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+        temp->data = element;
+        temp->lchild = temp->rchild = NULL;
+        return temp;
+    }
+    else
+    {
+        if(element>node->data)
+            node->rchild = element;
+        else if(element<node->data)
+            node->lchild = element;
+        else
+            printf("Can't store duplicates. \n");
+        return node;
+    }
+}
+
+
+nodeptr searchBST(nodeptr node, int key)
+{
+    if(node==NULL)
+    {
+        printf("Empty tree. \n");
+        exit(1);
+    }
+    if(node->data==key)
+        return node;
+    else if(node->data<key)
+        return searchBST(node->rchild, key);
+    else
+        return searchBST(node->lchild, key);
+}
+
+
+nodeptr insertionBST(nodeptr node, int item)
+{
+    nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+    temp->data = item;
+    temp->lchild = temp->rchild = NULL;
+    if(node==NULL)
+    {
+        return temp;
+    }
+    nodeptr parent = NULL;
+    nodeptr current = node;
+    while(current)
+    {
+        parent = current;
+        if(current->data==item)
+        {
+            printf("Can't have duplicates. \n");
+            free(temp);
+            return node;
+        }
+        else if(item>current->data)
+            current = current->rchild;
+        else
+            current = current->lchild;
+    }
+    if(parent->data>item)
+        parent->lchild = temp;
+    else
+        parent->rchild = temp;
+}
+
+
 int main()
 {
     printf("Enter the tree root: \n");
