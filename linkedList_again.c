@@ -169,3 +169,76 @@ void deleteMiddle()
 }
 
 
+void search()
+{
+    if(head==NULL)
+    {
+        printf("Empty list. \n");
+        return;
+    }
+    printf("Enter the element to search: \n");
+    int key;
+    scanf("%d", &key);
+    nodeptr temp = head;
+    int found=0;
+    while(temp!=NULL)
+    {
+        if(temp->data==key)
+        {
+            found=1;
+            break;
+        }
+        else
+            temp=temp->next;
+    }
+    if(found)
+        printf("Found. \n");
+    else
+        printf("Not found. \n");
+    
+}
+
+
+void reverseLL()
+{
+    if(head==NULL)
+    {
+        printf("Empty list. \n");
+        return;
+    }
+    nodeptr prev=NULL, current=head, next=NULL;
+    while(current!=NULL)
+    {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    head = prev;
+    printf("List reversed. \n");
+}
+
+
+void divideintoSublists(nodeptr headmain)
+{
+    if(headmain==NULL)
+    {
+        printf("Empty list. \n");
+        return;
+    }
+    nodeptr odd = head;
+    nodeptr even = head->next;
+    nodeptr evenHead = even;
+
+    while(even!=NULL && even->next!=NULL)
+    {
+        odd->next = odd->next->next;
+        even->next = even->next->next;
+        odd = odd->next;
+        even = even->next;
+
+    }
+    odd->next = evenHead;
+}
+
+
