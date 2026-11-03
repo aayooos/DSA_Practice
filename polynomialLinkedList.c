@@ -77,17 +77,11 @@ void print_poly(polynode p)
 
 polynode padd(polynode a, polynode b)
 {
-    polynode c, rear, temp;
+    polynode head, rear, temp;
     int sum;
 
-    rear = (polynode)malloc(sizeof(struct polynode));
-    if(rear == NULL)
-    {
-        printf("Memory allocation failed\n");
-        exit(1);
-    }
-    rear->next = NULL;
-    c = rear;
+    rear = getNode();
+    head = rear;
 
     while(a && b)
     {
@@ -113,18 +107,24 @@ polynode padd(polynode a, polynode b)
         }
     }
 
-    for(; a; a = a->next)
+    while(a!=NULL)
+    {
         attach(a->coeff, a->expo, &rear);
-    for(; b; b = b->next)
+        a=a->next;
+    }
+    while(b!=NULL)
+    {
         attach(b->coeff, b->expo, &rear);
+        b=b->next;
+    }
 
     rear->next = NULL;
 
-    temp = c;
-    c = c->next;
+    temp = head;
+    head = head->next;
     free(temp);
 
-    return c;
+    return head;
 }
 
 void erase(polynode *ptr)

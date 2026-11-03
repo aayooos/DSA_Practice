@@ -37,7 +37,7 @@ int checkDuplicate(char expr[])
         {
             if(stack[top]=='(')
                 return 1;
-            while(stack[top]=='(')
+            while(stack[top]!='(')
                 pop();
             pop();
         }
