@@ -1,0 +1,336 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node
+{
+    int data;
+    struct node *lchild;
+    struct node *rchild;
+} *nodeptr;
+
+
+nodeptr createTreeRec(int item)
+{
+    if(item==-1)
+        return NULL;
+    nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+    if(temp==NULL)
+    {
+        printf("Allocation failed. \n");
+        exit(1);
+    }
+    temp->data = item;
+    printf("Enter the data for left child of %d, -1 for null: \n", item);
+    int left, right;
+    scanf("%d", &left);
+    temp->lchild = createTreeRec(left);
+    printf("Enter the data for right child of %d, -1 for null: \n", item);
+    scanf("%d", &right);
+    temp->rchild = createTreeRec(right);
+    return temp;
+}
+
+
+void inOrderTraversalIter(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    int top=-1;
+    nodeptr stack[100];
+    nodeptr current = node;
+    while(top!=-1 || current!=NULL)
+    {
+        while(current!=NULL)
+        {
+            stack[++top] = current;
+            current = current->lchild;
+        }
+        current = stack[top--];
+        printf("%d ", current->data);
+        current = current->rchild;
+    }
+}
+
+
+void preOrderTraversalIter(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    int top=-1;
+    nodeptr stack[100];
+    stack[++top] = node;
+    while(top!=-1)
+    {
+        nodeptr current = stack[top--];
+        printf("%d ", current->data);
+        if(current->rchild!=NULL)
+            stack[++top] = current->rchild;
+        if(current->lchild!=NULL)
+            stack[++top] = current->lchild;
+    }
+}
+
+
+void postOrderTraversalIter(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    int top1=-1, top2=-1;
+    nodeptr stack1[100], stack2[100];
+    stack1[++top1] = node;
+    while(top1!=-1)
+    {
+        nodeptr current = stack1[top1--];
+        stack2[++top2] = current;
+        if(current->lchild!=NULL)
+            stack1[++top1] = current->lchild;
+        if(current->rchild!=NULL)
+            stack1[++top1] = current->rchild;
+    }
+    while(top2!=-1)
+        printf("%d ", stack2[top2--]->data);
+}
+
+
+void levelOrderTraversal(nodeptr node)
+{
+    nodeptr queue[100];
+    int front=0, rear=-1;
+    queue[++rear] = node;
+    while(front<=rear)
+    {
+        nodeptr current = queue[front++];
+        printf("%d ", current->data);
+        if(current->lchild!=NULL)
+            queue[++rear] = current->lchild;
+        if(current->rchild!=NULL)
+            queue[++rear] = current->rchild;
+    }
+}
+
+
+void printParent(nodeptr node, nodeptr key)
+{
+    if(node==NULL || key==NULL)
+        return;
+    if(node->lchild==key || node->rchild==key)
+        printf("Parent is %d \n", node->data);
+    else
+    {
+        printParent(node->lchild, key);
+        printParent(node->rchild, key);
+    }
+}
+
+
+int countLeafNodes(nodeptr node)
+{
+    if(node==NULL)
+        return 0;
+    if(node->lchild==NULL && node->rchild==NULL)
+        return 1;
+    return countLeafNodes(node->lchild) + countLeafNodes(node->rchild);
+}
+
+
+int printDepth(nodeptr node)
+{
+    if(node==NULL)
+        return 0;
+    int leftDepth = printDepth(node->lchild);
+    int rightDepth = printDepth(node->rchild);
+    return 1 + (leftDepth>rightDepth ? leftDepth : rightDepth);
+}
+
+
+nodeptr returnParent(nodeptr node, nodeptr key)
+{
+    if(node==NULL || key==NULL)
+        return NULL;
+    if(node->lchild==key || node->rchild==key)
+        return node;
+    nodeptr result = returnParent(node->lchild, key);
+    if(result!=NULL)
+        return result;
+    return returnParent(node->rchild, key);
+}
+
+
+void printAncestors(nodeptr node, nodeptr key)
+{
+    if(node==NULL)
+        return;
+    nodeptr parent = returnParent(node, key);
+    if(parent==NULL)
+        return;
+    printf("%d ", parent->data);
+    printAncestors(node, parent);
+}
+
+
+int search(nodeptr node, int key)
+{
+    if(node==NULL)
+        return 0;
+    if(node->data==key)
+        return 1;
+    return search(node->lchild, key) || search(node->rchild, key);
+}
+
+
+nodeptr createCopy(nodeptr node)
+{
+    if(node==NULL)
+        return NULL;
+    nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+    temp->data = node->data;
+    temp->lchild = createCopy(node->lchild);
+    temp->rchild = createCopy(node->rchild);
+    return temp;
+}
+
+
+int countNodes(nodeptr node)
+{
+    if(node==NULL)
+        return 0;
+    return 1 + countNodes(node->lchild) + countNodes(node->rchild);
+}
+
+
+int equality(nodeptr node1, nodeptr node2)
+{
+    if(node1==NULL && node2==NULL)
+        return 1;
+    if(node1==NULL || node2==NULL)
+        return 0;
+    return ((node1->data==node2->data) &&
+            equality(node1->lchild, node2->lchild) &&
+            equality(node1->rchild, node2->rchild));
+}
+
+
+nodeptr createBST(nodeptr node, int element)
+{
+    if(node==NULL)
+    {
+        nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+        temp->data = element;
+        temp->lchild = temp->rchild = NULL;
+        return temp;
+    }
+    if(element>node->data)
+        node->rchild = createBST(node->rchild, element);
+    else if(element<node->data)
+        node->lchild = createBST(node->lchild, element);
+    else
+        printf("Can't store duplicates. \n");
+    return node;
+}
+
+
+nodeptr searchBST(nodeptr node, int key)
+{
+    if(node==NULL)
+        return NULL;
+    if(node->data==key)
+        return node;
+    else if(node->data<key)
+        return searchBST(node->rchild, key);
+    else
+        return searchBST(node->lchild, key);
+}
+
+
+nodeptr insertionBST(nodeptr node, int item)
+{
+    nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+    temp->data = item;
+    temp->lchild = temp->rchild = NULL;
+    if(node==NULL)
+        return temp;
+    nodeptr parent = NULL;
+    nodeptr current = node;
+    while(current)
+    {
+        parent = current;
+        if(current->data==item)
+        {
+            printf("Can't have duplicates. \n");
+            free(temp);
+            return node;
+        }
+        else if(item>current->data)
+            current = current->rchild;
+        else
+            current = current->lchild;
+    }
+    if(parent->data>item)
+        parent->lchild = temp;
+    else
+        parent->rchild = temp;
+    return node;
+}
+
+
+nodeptr deleteBST(nodeptr *root, int item)
+{
+    nodeptr parent, cur, q, succ;
+
+    if(*root==NULL)
+    {
+        printf("Empty Tree.\n");
+        return *root;
+    }
+
+    parent = NULL;
+    cur = *root;
+    while(cur && (cur->data!=item))
+    {
+        parent = cur;
+        if(item<cur->data)
+            cur = cur->lchild;
+        else
+            cur = cur->rchild;
+    }
+
+    if(cur==NULL)
+    {
+        printf("Item Not Found.\n");
+        return *root;
+    }
+
+    // case 1: node to delete has empty left subtree
+    if(cur->lchild==NULL)
+        q = cur->rchild;
+    // case 2: node to delete has empty right subtree
+    else if(cur->rchild==NULL)
+        q = cur->lchild;
+    // case 3: interior node, find inorder successor
+    else
+    {
+        parent = cur;
+        succ = cur->rchild;
+        while(succ->lchild)
+        {
+            parent = succ;
+            succ = succ->lchild;
+        }
+        cur->data = succ->data;
+        cur = succ;
+        q = cur->rchild;
+    }
+
+    if(parent==NULL)
+    {
+        free(cur);
+        *root = q;
+        return *root;
+    }
+    if(cur==parent->lchild)
+        parent->lchild = q;
+    else
+        parent->rchild = q;
+    free(cur);
+    return *root;
+}

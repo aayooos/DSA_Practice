@@ -369,49 +369,409 @@
 //     return element;
 // }
 
+// #include <stdio.h>
+// #include <stdlib.h>
+// #define max 100
+// int queue[max];
+// int front = -1;
+// int rear =-1;
+
+// void enqueue(int item)
+// {
+//     if(front==-1 && rear==-1)
+//     {
+//         front = rear = 0;
+//         queue[rear] = item;
+//     }
+//     else if((rear+1)%max==front)
+//     {
+//         printf("Full. \n");
+//         return;
+//     }
+//     else
+//     {
+//         rear = (rear+1)%max;
+//         queue[rear] = item;
+//     }
+// }
+
+// int dequeue()
+// {
+//     if(front==-1 && rear==-1)
+//     {
+//         printf("Empty. \n");
+//         return;
+//     }
+//     if(front==rear)
+//     {
+//         int element = queue[front];
+//         front = rear = -1;
+//         return element;
+//     }
+//     else
+//     {
+//         int element = queue[front];
+//         front = (front+1)%max;
+//         return element;
+//     }
+// }
+
 #include <stdio.h>
 #include <stdlib.h>
-#define max 100
-int queue[max];
-int front = -1;
-int rear =-1;
 
-void enqueue(int item)
+typedef struct node
 {
-    if(front==-1 && rear==-1)
+    int data;
+    struct node *lchild;
+    struct node *rchild;
+}*nodeptr;
+
+nodeptr getNode()
+{
+    nodeptr temp = (nodeptr)malloc(sizeof(struct node));
+    if(temp==NULL)
     {
-        front = rear = 0;
-        queue[rear] = item;
-    }
-    else if((rear+1)%max==front)
-    {
-        printf("Full. \n");
+        printf("Allocation failed. \n");
         return;
     }
-    else
+    temp->lchild = NULL;
+    temp->rchild = NULL;
+    return temp;
+}
+
+nodeptr createTree(int item)
+{
+    if(item!=-1)
     {
-        rear = (rear+1)%max;
-        queue[rear] = item;
+        nodeptr temp = getNode();
+        temp->data = item;
+        printf("Enter the left child data for %d, -1 for null: ", item);
+        int left, right;
+        scanf("%d", &left);
+        temp->lchild = createTree(left);
+        printf("Enter the right child data for %d, -1 for null: ", item);
+        scanf("%d", &right);
+        temp->rchild = createTree(right);
+        return temp;
+    }
+    return NULL;
+}
+
+void preOrderTraversalRec(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    printf("%d", node->data);
+    preOrderTraversalRec(node->lchild);
+    preOrderTraversalRec(node->lchild);
+}
+
+void inOrderTraversalRec(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    inOrderTraversalRec(node->lchild);
+    printf("%d", node->data);
+    inOrderTraversalRec(node->rchild);
+}
+
+void postOrderTraversalIter(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    postOrderTraversalIter(node->lchild);
+    postOrderTraversalIter(node->rchild);
+    printf("%d", node->data);
+}
+
+void preOrderTraversalIter(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    nodeptr stack[100];
+    int top=-1;
+    stack[++top] = node;
+    while(top!=-1)
+    {
+        nodeptr current = stack[top--];
+        printf("%d", current->data);
+        if(current->rchild!=NULL)
+            stack[++top] = current->rchild;
+        if(current->lchild!=NULL)
+            stack[++top] = current->lchild;
     }
 }
 
-int dequeue()
+void inOrderTraversalIter(nodeptr node)
 {
-    if(front==-1 && rear==-1)
-    {
-        printf("Empty. \n");
+    if(node==NULL)
         return;
-    }
-    if(front==rear)
+    int top=-1;
+    nodeptr current = node;
+    nodeptr stack[100];
+    while(top!=-1 || current!=NULL)
     {
-        int element = queue[front];
-        front = rear = -1;
-        return element;
+        while(current!=NULL)
+        {
+            stack[++top] = current;
+            current = current->lchild;
+        }
+        current = stack[top--];
+        printf("%d", current->data);
+        current = current->rchild;
     }
+}
+
+void postOrderTraversalIter(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    int top1=-1, top2=-1;
+    nodeptr stack1[100], stack2[100];
+    stack1[++top1] = node;
+    while(top1!=-1)
+    {
+        nodeptr current = stack1[top1--];
+        stack2[++top2] = current;
+        if(current->lchild!=NULL)
+            stack2[++top2] = current->lchild;
+        if(current->rchild!=NULL)
+            stack2[++top2] = current->rchild;
+    }
+    while(top2!=-1)
+        printf("%d ", stack2[top2--]->data);
+}
+
+void levelOrderTraversalIter(nodeptr node)
+{
+    if(node==NULL)
+        return;
+    int front=0;
+    int rear=-1;
+    nodeptr queue[100];
+    queue[++rear] = node;
+    while(front<=rear)
+    {
+        nodeptr current = queue[front++];
+        printf("%d", current->data);
+        if(current->lchild!=NULL)
+            queue[++rear] = current->lchild;
+        if(current->rchild!=NULL)
+            queue[++rear] = current->rchild;
+    }
+
+}
+
+int search(int key, nodeptr node)
+{
+    if(node==NULL)
+        return 0;
+    if(node->data==key)
+        return 1;
+    if(search(key, node->lchild))
+        return 1;
+    return search(key, node->rchild);
+}
+
+nodeptr copy(nodeptr node)
+{
+    if(node==NULL)
+        return NULL;
+    nodeptr temp = getNode();
+    temp->data = node->data;
+    temp->lchild = copy(node->lchild);
+    temp->rchild = copy(node->rchild);
+    return temp;
+}
+
+int countNodes(nodeptr node)
+{
+    if(node==NULL)
+        return 0;
+    return 1 + countNodes(node->lchild) + countNodes(node->rchild);
+}
+
+int countLeafNodes(nodeptr node)
+{
+    if(node==NULL)  
+        return 0;
+    else if(node->lchild==NULL && node->rchild==NULL)
+        return 1;
+    return countLeafNodes(node->lchild) + countLeafNodes(node->rchild);
+}
+
+int equalTrees(nodeptr node1, nodeptr node2)
+{
+    if(node1==NULL && node2==NULL)
+        return 1;
+    else if(node1==NULL || node2==NULL)
+        return 0;
+    return ((node1->data==node2->data) && 
+            (equalTrees(node1->lchild, node2->lchild)) &&
+            (equalTrees(node1->rchild, node2->rchild)));
+}
+
+nodeptr buildExpressionTree(char* postfix)
+{
+    nodeptr stack[100];
+    int top=-1;
+    int i=0;
+    while(postfix[i]!='\0')
+    {
+        if(postfix[i]==' ')
+        {
+            i++;
+            continue;
+        }
+        nodeptr temp = getNode();
+        temp->data = postfix[i];
+        if(postfix[i]=='+' || postfix[i]=='-' || postfix[i]=='*' || postfix[i]=='/')
+        {
+            temp->lchild = stack[top--];
+            temp->rchild = stack[top--];
+        }
+        stack[++top] = temp;
+        i++;
+    }
+    return stack[top];
+}
+
+int evaluateExpression(nodeptr node)
+{
+    if(node==NULL)
+        return 0;
+    if(node->lchild==NULL && node->rchild==NULL)
+        return node->data-'0';
+    int left = evaluateExpression(node->lchild);
+    int right = evaluateExpression(node->rchild);
+    if(node->data=='+')
+        return left+right;
+    else if(node->data=='-')
+        return left-right;
+    else if(node->data=='*')
+        return left*right;
+    else if(node->data=='/')
+        return left/right;
+    
+    return 0;
+}
+
+nodeptr createBST(nodeptr root, int item)
+{
+    if(root==NULL)
+    {
+        root = getNode();
+        root->data = item;
+    }
+    if(item<root->data)
+        root->lchild = createBST(root->lchild, item);
+    else if(item>root->data)
+        root->rchild = createBST(root->rchild, item);
+    else
+        printf("Duplicates not allowed. \n");
+    return root;
+}
+
+nodeptr bstSearch(nodeptr root, int key)
+{
+    if(root==NULL)
+        return NULL;
+    if(key==root->data)
+        return root;
+    else if(key<root->data)
+        return bstSearch(root->lchild, key);
+    else
+        return bstSearch(root->rchild, key);
+}
+
+nodeptr bstSearchIter(nodeptr root, int key)
+{
+    while(root)
+    {
+        if(key==root->data)
+            return root;
+        else if(key<root->data)
+            return bstSearchIter(root->lchild, key);
+        else 
+            return bstSearchIter(root->rchild, key);
+    }
+    return NULL;
+}
+
+nodeptr insertBST(nodeptr root, int item)
+{
+    nodeptr temp = getNode();
+    temp->data = item;
+    nodeptr current = root;
+    nodeptr parent = NULL;
+    if(root==NULL)
+        return temp;
+    while(current)
+    {
+        parent = current;
+        if(item==current->data)
+        {
+            printf("Duplicates are not allowed. \n");
+            return root;
+        }
+        else if(item<current->data)
+        {
+            current = current->lchild;
+        }
+        else
+            current = current->rchild;
+    }
+    if(item<parent->data)
+        parent->lchild = temp;
+    else
+        parent->rchild = temp;
+    return root;
+}
+
+
+nodeptr findMin(nodeptr node)
+{
+    while(node->lchild!=NULL)
+        node=node->lchild;
+    return node;
+}
+
+nodeptr deleteBST(nodeptr node, int item)
+{
+    if(node==NULL)
+    {
+        printf("Item not found. \n");
+        return NULL;
+    }
+    if(item<node->data)
+        node->lchild = deleteBST(node->lchild, item);
+    else if(item>node->data)
+        node->rchild = deleteBST(node->rchild, item);
     else
     {
-        int element = queue[front];
-        front = (front+1)%max;
-        return element;
+        if(node->lchild==NULL && node->rchild==NULL)
+        {
+            free(node);
+            return NULL;
+        }
+        else if(node->lchild==NULL)
+        {
+            nodeptr temp = node->rchild;
+            free(node);
+            return temp;
+        }
+        else if(node->rchild==NULL)
+        {
+            nodeptr temp = node->lchild;
+            free(node);
+            return temp;
+        }
+        else
+        {
+            nodeptr temp = findMin(node->rchild);
+            node->data = temp->data;
+            node->rchild = deleteBST(node->rchild, temp->data);
+        }
     }
+    return node;
 }
