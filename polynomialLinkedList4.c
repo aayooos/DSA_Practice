@@ -41,7 +41,7 @@ polynode readPoly()
     scanf("%d", &n);
     for(int i=0; i<n; i++)
     {
-        printf("Enter the coefficient and exponenet: \n");
+        printf("Enter the coefficient and exponent: \n");
         scanf("%d", &coeff);
         scanf("%d", &expo);
         if(coeff!=0)

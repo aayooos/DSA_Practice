@@ -334,3 +334,46 @@ nodeptr deleteBST(nodeptr *root, int item)
     free(cur);
     return *root;
 }
+
+
+nodeptr deleteBST2(nodeptr node, int key)
+{
+    if(node==NULL)
+    {
+        printf("Not found. \n");
+        return NULL;
+    }
+    if(key<node->data)
+        node->lchild = deleteBST2(node->lchild, key);
+    else if(key>node->data)
+        node->rchild = deleteBST2(node->rchild, key);
+    else
+    {
+        if(node->lchild==NULL && node->rchild==NULL)
+        {
+            free(node);
+            return NULL;
+        }
+        else if(node->lchild==NULL)
+        {
+            nodeptr temp = node->rchild;
+            free(node);
+            return temp;
+        }
+        else if(node->rchild==NULL)
+        {
+            nodeptr temp = node->lchild;
+            free(node);
+            return temp;
+        }
+        else
+        {
+            nodeptr temp = node->rchild;
+            while(temp->lchild!=NULL)
+                temp = temp->lchild;
+            node->data = temp->data;
+            node->rchild = deleteBST2(node->rchild, temp->data);
+        }
+    }
+    return node;
+}
